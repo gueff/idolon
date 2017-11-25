@@ -1,2 +1,2 @@
-# ImageServerIdolon
+# Idolon
 PHP Image Server
