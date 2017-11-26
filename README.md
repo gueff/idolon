@@ -1,6 +1,8 @@
 # Idolon
 A PHP Image Server
 
+Idolon is a PHP Image Server that can be used to get variations of your original images. Idolon resizes on the fly, serves the resized result directly and also saves the result.
+
 ## Requirements
 - PHP 7
 - imagemagick's convert Method
