@@ -10,15 +10,28 @@ Idolon is a PHP Image Server that can be used to get variations of your original
     - e.g. Linux:  `$ sudo apt-get install imagemagick`
     - @see https://www.imagemagick.org/script/index.php, https://github.com/ImageMagick/ImageMagick
 
+## Installation
+create the composer.json file with following content:
+~~~
+{
+    "require": {
+        "gueff/Idolon":"dev-master"
+    }
+}
+~~~
+
+run installation
+~~~
+$ composer install
+~~~
+
 ## Usage
 
 Frontend HTML
 ~~~
 <!DOCTYPE html>
-<html lang="de">
-    <head>
-        <title></title>
-    </head>
+<html lang="en">
+    <head></head>
     <body>
     
         <!-- request an image with width 250px -->        
@@ -41,4 +54,4 @@ $oIdolon
     ->serve();
 ~~~
 
-**see examples folder**
+**see example folder**
