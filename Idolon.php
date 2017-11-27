@@ -9,8 +9,8 @@
  * @author Guido K.B.W. Üffing <info@ueffing.net>
  * @license GNU GENERAL PUBLIC LICENSE Version 3. See /doc/COPYING
  * @abstract serves image
- * @requires imagemagick's convert
- * @example see exmaples folder
+ * @require imagemagick's convert
+ * @example see examples folder
  * @see https://github.com/gueff/Idolon
  */       
 class Idolon
