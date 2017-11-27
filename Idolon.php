@@ -331,6 +331,42 @@ class Idolon
         return $this;
     }
 
+	/**
+	 * set image
+	 * @param string $sImage
+	 */
+	public function setImage(string $sImage = '')
+	{
+		$this->_sImage = $sImage;
+	}
+
+	/**
+	 * set x value
+	 * @param int $iX
+	 */
+	public function setDimensionX(int $iX = 0)
+	{
+		$this->_iDimensionX = $iX;
+	}
+
+	/**
+	 * set y value
+	 * @param int $iY
+	 */
+	public function setDimensionY(int $iY = 0)
+	{
+		$this->_iDimensionY = $iY;
+	}
+
+	/**
+	 * set redirect value
+	 * @param int $iRedirect
+	 */
+	public function setRedirect(int $iRedirect = 1)
+	{
+		$this->_iRedirect = $iRedirect;
+	}	
+	
     //----------------------------------------
     // Getter
 
