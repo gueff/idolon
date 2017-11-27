@@ -15,7 +15,7 @@ create the composer.json file with following content:
 ~~~
 {
     "require": {
-        "gueff/Idolon":"dev-master"
+        "gueff/idolon":"dev-master"
     }
 }
 ~~~
