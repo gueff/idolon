@@ -333,39 +333,55 @@ class Idolon
 
 	/**
 	 * set image
+     * @access public
 	 * @param string $sImage
+     * @return \Idolon
 	 */
-	public function setImage(string $sImage = '')
+	public function setImage(string $sImage = '') : \Idolon
 	{
 		$this->_sImage = $sImage;
+        
+        return $this;
 	}
 
 	/**
 	 * set x value
+     * @access public
 	 * @param int $iX
+     * @return \Idolon
 	 */
-	public function setDimensionX(int $iX = 0)
+	public function setDimensionX(int $iX = 0) : \Idolon
 	{
 		$this->_iDimensionX = $iX;
+        
+        return $this;
 	}
 
 	/**
 	 * set y value
+     * @access public
 	 * @param int $iY
+     * @return \Idolon
 	 */
-	public function setDimensionY(int $iY = 0)
+	public function setDimensionY(int $iY = 0) : \Idolon
 	{
 		$this->_iDimensionY = $iY;
+        
+        return $this;
 	}
 
 	/**
 	 * set redirect value
+     * @access public
 	 * @param int $iRedirect
+     * @return \Idolon
 	 */
-	public function setRedirect(int $iRedirect = 1)
+	public function setRedirect(int $iRedirect = 1) : \Idolon
 	{
 		$this->_iRedirect = $iRedirect;
-	}	
+        
+        return $this;
+	}		
 	
     //----------------------------------------
     // Getter
