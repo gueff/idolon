@@ -4,7 +4,7 @@
     "keywords": ["php","php7","image","serve","resize"],
     "homepage": "https://github.com/gueff/Idolon",
     "type": "library",
-    "license": "GPLv3",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Guido K.B.W. Ueffing"
