@@ -89,6 +89,13 @@ class Idolon
     protected $_sImage = '';
     
     /**
+     * prevent oversizing
+     * @access protected 
+     * @var boolean
+     */
+    protected $_bPreventOversizing = true;
+    
+    /**
      * path to imagemagick's convert
      * @access protected 
      * @var string
@@ -150,6 +157,7 @@ class Idolon
         (isset($aConfig['sConvertExecutable'])) ? $this->_sConvertExecutable = (string) $aConfig['sConvertExecutable'] : false;
         (isset($aConfig['s404Base64Image'])) ? $this->_s404Base64Image = (string) $aConfig['s404Base64Image'] : false;
         (isset($aConfig['sImagePath'])) ? $this->_sImagePath = (string) $aConfig['sImagePath'] : false;
+        (isset($aConfig['bPreventOversizing'])) ? $this->_bPreventOversizing = (boolean) $aConfig['bPreventOversizing'] : true;
         
         if (isset($aConfig['sImage']))
         {
@@ -621,7 +629,7 @@ class Idolon
 		($this->_iDimensionY <= 0) ? $this->_iDimensionY = $aDimension[1] : false;
         
         // prevent resizing to higher x or y values than original has
-        if (false === \MVC\Registry::isRegistered('IDOLON_PREVENT_OVERSIZING') || true === \MVC\Registry::get('IDOLON_PREVENT_OVERSIZING'))
+        if (true === $this->_bPreventOversizing)
         {
             if  ($this->_iDimensionX > $aDimension[0])
             {
