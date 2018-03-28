@@ -38,13 +38,6 @@ class Idolon
      * @var string
      */
     protected $_sParamKeyR = 'r';
-
-    /**
-     * image by name
-     * @access protected 
-     * @var string
-     */
-    protected $_sImage = '';
     
     /**
      * X-Dimension
@@ -87,6 +80,13 @@ class Idolon
      * @var string
      */
     protected $_sImagePath = __DIR__;
+
+    /**
+     * image by name
+     * @access protected 
+     * @var string
+     */
+    protected $_sImage = '';
     
     /**
      * path to imagemagick's convert
@@ -185,7 +185,7 @@ class Idolon
         else // default
         {
             (isset($_GET[$this->_sParamKeyR])) ? $this->_iRedirect  = (int) $_GET[$this->_sParamKeyR] : false;
-        }
+        }        
 	}
     
     /**
@@ -489,7 +489,7 @@ class Idolon
 	protected function essentialsGiven() : bool
 	{
 		if  (
-                    true === ((!isset($this->_sImage) || empty($this->_sImage)) || !file_exists($this->_sImagePath . '/' . $this->_sImage))
+                    true === ((!isset($this->_sImage) || empty($this->_sImage)) || !file_exists(realpath($this->_sImagePath . '/' . $this->_sImage)) || !is_file(realpath($this->_sImagePath . '/' . $this->_sImage)))
                 ||  true == ((0 === $this->_iDimensionX) && (0 === $this->_iDimensionY))
             )
 		{
@@ -508,15 +508,14 @@ class Idolon
 	 */
 	protected function imageRenewed() : bool
 	{
-		$sImageFile = $this->_sImagePath . '/' . $this->_sImage;
 		$sDotfile = $this->_sImagePath . '/' . '.' . $this->_sImage . '.txt';
 		
-		if (!file_exists ($sImageFile))
+		if (!file_exists (realpath($this->_sImagePath . '/' . $this->_sImage)))
 		{
 			return false;
 		}
 		
-		$iFilemtime = filemtime($sImageFile);
+		$iFilemtime = filemtime(realpath($this->_sImagePath . '/' . $this->_sImage));
 
 		if (file_exists($sDotfile))
 		{
@@ -543,7 +542,7 @@ class Idolon
      */
 	protected function clearCachedFiles ()
 	{
-		$aCached = glob($this->_sImagePath . '/' . $this->_sImage . '_*');
+		$aCached = glob(realpath($this->_sImagePath . '/' . $this->_sImage) . '_*');
 		$sDotfile = $this->_sImagePath . '/' . '.' . $this->_sImage . '.txt';
 		
 		foreach ($aCached as $sImage)
@@ -568,7 +567,7 @@ class Idolon
 	protected function getDimensionArray() : array
 	{
 		// get dimensions
-		$aDimension = (!empty($this->_sImage) && file_exists($this->_sImagePath . '/' . $this->_sImage)) ? getimagesize($this->_sImagePath . '/' . $this->_sImage) : array('mime' => 'image/png');
+		$aDimension = (!empty($this->_sImage) && file_exists(realpath($this->_sImagePath . '/' . $this->_sImage)) && is_file(realpath($this->_sImagePath . '/' . $this->_sImage))) ? getimagesize(realpath($this->_sImagePath . '/' . $this->_sImage)) : array('mime' => 'image/png');
 
 		return $aDimension;
 	}
@@ -621,18 +620,22 @@ class Idolon
 		($this->_iDimensionX <= 0) ? $this->_iDimensionX = $aDimension[0] : false;
 		($this->_iDimensionY <= 0) ? $this->_iDimensionY = $aDimension[1] : false;
         
-		if  ($this->_iDimensionX > $aDimension[0])
-		{
-			$this->log($this->_iDimensionX . ' > ' . $aDimension[0]);
-			$this->deliver();
-			return false;
-		}
-		if ($this->_iDimensionY > $aDimension[1])
-		{
-			$this->log($this->_iDimensionX . ' > ' . $aDimension[0]);
-			$this->deliver();
-			return false;
-		}
+        // prevent resizing to higher x or y values than original has
+        if (false === \MVC\Registry::isRegistered('IDOLON_PREVENT_OVERSIZING') || true === \MVC\Registry::get('IDOLON_PREVENT_OVERSIZING'))
+        {
+            if  ($this->_iDimensionX > $aDimension[0])
+            {
+                $this->log('_iDimensionX:' . $this->_iDimensionX . ' > $aDimension[0]:' . $aDimension[0]);
+                $this->deliver();
+                return false;
+            }
+            if ($this->_iDimensionY > $aDimension[1])
+            {
+                $this->log('_iDimensionY:' . $this->_iDimensionY . ' > $aDimension[1]:' . $aDimension[1]);
+                $this->deliver();
+                return false;
+            }
+        }
         
         return true;
 	}
@@ -764,7 +767,7 @@ class Idolon
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
 
-        if (true === file_exists($this->_sImagePath . '/' . $sFilename))
+        if (true === file_exists(realpath($this->_sImagePath . '/' . $sFilename)) && is_file(realpath($this->_sImagePath . '/' . $sFilename)))
         {
             $this->log($this->_sImagePath . '/' . $sFilename);
             header("Content-Length: " . filesize($this->_sImagePath . '/' . $sFilename) . " bytes");
@@ -804,7 +807,7 @@ class Idolon
 		ob_end_clean();
 		(!empty($_GET)) ? $sLog.= "\t" . $sPrintr : false;
 
-        $sLog.= $sMessage;
+        $sLog.= "\t" . $sMessage;
         
 		$this->_sLog.= $sLog . "\n";
 	}
