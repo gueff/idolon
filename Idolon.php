@@ -481,7 +481,7 @@ class Idolon
 		$this->aspectSafe($fRatio);
 		$sFilenameDelivery = $this->buildFilename();
 
-		if (!file_exists($sFilenameDelivery))
+		if (!file_exists(realpath($this->_sImagePath . '/' . $sFilenameDelivery)))
 		{
 			$this->create($this->_sImage, $sFilenameDelivery);
 		}
