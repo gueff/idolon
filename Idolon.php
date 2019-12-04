@@ -198,15 +198,16 @@ class Idolon
     
     /**
      * start serving requested image
-     * @access public
-     * @return void
+     * @return bool
      */
     public function serve()
     {               
 		// sanitize + filter
 		$this->sanitize();
 		$this->filter();
-        $this->proceed();
+        $bSuccess = $this->proceed();
+
+        return $bSuccess;
     }
 
     //----------------------------------------
@@ -216,9 +217,9 @@ class Idolon
      * sets path to images folder
      * @access public
      * @param string $sImagePath
-     * @return \Idolon
+     * @return $this
      */
-    public function setImagePath(string $sImagePath = '') : \Idolon
+    public function setImagePath(string $sImagePath = '')
     {
         if ('' !== $sImagePath)
         {
@@ -233,9 +234,9 @@ class Idolon
      * sets Sanitize Closure
      * @access public
      * @param callable $oSanitize
-     * @return \Idolon
+     * @return $this
      */
-    public function setSanitize(callable $oSanitize) : \Idolon
+    public function setSanitize(callable $oSanitize)
     {
         if (is_callable($oSanitize))
         {
@@ -249,9 +250,9 @@ class Idolon
      * sets Filter Closure
      * @access public
      * @param callable $oFilter
-     * @return \Idolon
+     * @return $this
      */
-    public function setFilter(callable $oFilter) : \Idolon
+    public function setFilter(callable $oFilter)
     {
         if (is_callable($oFilter))
         {
@@ -265,9 +266,9 @@ class Idolon
      * set path to imagemagick's convert binary
      * @access public
      * @param string $sConvertExecutable
-     * @return \Idolon
+     * @return $this
      */
-    public function setConvert(string $sConvertExecutable) : \Idolon
+    public function setConvert(string $sConvertExecutable)
     {
         $this->_sConvertExecutable = $sConvertExecutable;
         
@@ -278,9 +279,9 @@ class Idolon
      * sets 404 base64 image
      * @access public
      * @param string $s404Base64Image
-     * @return \Idolon
+     * @return $this
      */
-    public function set404Base64Image(string $s404Base64Image = '') : \Idolon
+    public function set404Base64Image(string $s404Base64Image = '')
     {
         $this->_s404Base64Image = $s404Base64Image;
         
@@ -291,9 +292,9 @@ class Idolon
      * sets setParamKeyI
      * @access public
      * @param string $sParamKeyI
-     * @return \Idolon
+     * @return $this
      */
-    public function setParamKeyI(string $sParamKeyI = '') : \Idolon
+    public function setParamKeyI(string $sParamKeyI = '')
     {
         $this->_sParamKeyI = $sParamKeyI;
         
@@ -304,9 +305,9 @@ class Idolon
      * sets setParamKeyX
      * @access public
      * @param string $sParamKeyX
-     * @return \Idolon
+     * @return $this
      */
-    public function setParamKeyX(string $sParamKeyX = '') : \Idolon
+    public function setParamKeyX(string $sParamKeyX = '')
     {
         $this->_sParamKeyX = $sParamKeyX;
         
@@ -317,9 +318,9 @@ class Idolon
      * sets $sParamKeyY
      * @access public
      * @param string $sParamKeyY
-     * @return \Idolon
+     * @return $this
      */
-    public function setParamKeyY(string $sParamKeyY = '') : \Idolon
+    public function setParamKeyY(string $sParamKeyY = '')
     {
         $this->_sParamKeyY = $sParamKeyY;
         
@@ -330,9 +331,9 @@ class Idolon
      * sets $sParamKeyR
      * @access public
      * @param string $sParamKeyR
-     * @return \Idolon
+     * @return $this
      */
-    public function setParamKeyR(string $sParamKeyR = '') : \Idolon
+    public function setParamKeyR(string $sParamKeyR = '')
     {
         $this->_sParamKeyR = $sParamKeyR;
         
@@ -343,9 +344,9 @@ class Idolon
 	 * set image
      * @access public
 	 * @param string $sImage
-     * @return \Idolon
+     * @return $this
 	 */
-	public function setImage(string $sImage = '') : \Idolon
+	public function setImage(string $sImage = '')
 	{
 		$this->_sImage = $sImage;
         
@@ -356,9 +357,9 @@ class Idolon
 	 * set x value
      * @access public
 	 * @param int $iX
-     * @return \Idolon
+     * @return $this
 	 */
-	public function setDimensionX(int $iX = 0) : \Idolon
+	public function setDimensionX(int $iX = 0)
 	{
 		$this->_iDimensionX = $iX;
         
@@ -369,9 +370,9 @@ class Idolon
 	 * set y value
      * @access public
 	 * @param int $iY
-     * @return \Idolon
+     * @return $this
 	 */
-	public function setDimensionY(int $iY = 0) : \Idolon
+	public function setDimensionY(int $iY = 0)
 	{
 		$this->_iDimensionY = $iY;
         
@@ -382,9 +383,9 @@ class Idolon
 	 * set redirect value
      * @access public
 	 * @param int $iRedirect
-     * @return \Idolon
+     * @return $this
 	 */
-	public function setRedirect(int $iRedirect = 1) : \Idolon
+	public function setRedirect(int $iRedirect = 1)
 	{
 		$this->_iRedirect = $iRedirect;
         
@@ -454,8 +455,7 @@ class Idolon
 
     /**
      * start serving process 
-     * @access protected 
-     * @return void
+     * @return bool
      */
 	protected function proceed()
 	{
@@ -476,7 +476,7 @@ class Idolon
         {
             return false;
         }
-        
+
         $fRatio = $this->getRatio($aDimension);
 		$this->aspectSafe($fRatio);
 		$sFilenameDelivery = $this->buildFilename();
@@ -486,7 +486,7 @@ class Idolon
 			$this->create($this->_sImage, $sFilenameDelivery);
 		}
         
-		$this->deliver($sFilenameDelivery);
+		return $this->deliver($sFilenameDelivery);
 	}
 
     /**
@@ -496,8 +496,24 @@ class Idolon
      */
 	protected function essentialsGiven() : bool
 	{
+	    // Dimension missing
+	    if (true == ((0 === $this->_iDimensionX)))
+        {
+            $aDimension = $this->getDimensionArray();
+            $this->_iDimensionX = $aDimension[0];
+        }
+
+        // Dimension missing
+        if (true == ((0 === $this->_iDimensionY)))
+        {
+            $aDimension = $this->getDimensionArray();
+            $this->_iDimensionY = $aDimension[1];
+        }
+
 		if  (
-                    true === ((!isset($this->_sImage) || empty($this->_sImage)) || !file_exists(realpath($this->_sImagePath . '/' . $this->_sImage)) || !is_file(realpath($this->_sImagePath . '/' . $this->_sImage)))
+                    true === ((!isset($this->_sImage) || empty($this->_sImage))
+                || !file_exists(realpath($this->_sImagePath . '/' . $this->_sImage))
+                || !is_file(realpath($this->_sImagePath . '/' . $this->_sImage)))
                 ||  true == ((0 === $this->_iDimensionX) && (0 === $this->_iDimensionY))
             )
 		{
@@ -589,7 +605,7 @@ class Idolon
 	protected function getRatio(array $aDimension = array()) : float
 	{
 		// calc ratio
-		$fRatio = ($aDimension[0] / $aDimension[1]);
+		$fRatio = round(($aDimension[0] / $aDimension[1]), 1);
 
 		return $fRatio;
 	}
@@ -667,12 +683,12 @@ class Idolon
      * @return void
      */
 	protected function aspectSafe(float $fRatio)
-	{        
+	{
         // quantify
         $iSub = strlen((string) $this->_iDimensionX);
         ($iSub > 4) ? $iSub = 4 : false;
         $sOriginalRatio = substr((string) $fRatio, 0, $iSub);
-        $sRequestedRatio = substr((string) ($this->_iDimensionX / $this->_iDimensionY), 0, $iSub);
+        $sRequestedRatio = round($this->_iDimensionX / $this->_iDimensionY, 1);
 
 		// aspect
         if  (
@@ -760,9 +776,8 @@ class Idolon
 
     /**
      * delivers image
-     * @access protected 
      * @param string $sFilename
-     * @return void
+     * @return bool
      */
 	protected function deliver(string $sFilename = '')
 	{
@@ -779,12 +794,26 @@ class Idolon
         {
             $this->log($this->_sImagePath . '/' . $sFilename);
             header("Content-Length: " . filesize($this->_sImagePath . '/' . $sFilename) . " bytes");
-    		readfile($this->_sImagePath . '/' . $sFilename);
+
+    		$mReadfile = readfile($this->_sImagePath . '/' . $sFilename);
+
+            if (false !== $mReadfile)
+            {
+                return true;
+            }
         }
         else
         {
-            echo base64_decode($this->_s404Base64Image);
+            $mDecode = base64_decode($this->_s404Base64Image);
+            echo $mDecode;
+
+            if (false !== $mDecode)
+            {
+                return true;
+            }
         }
+
+        return false;
 	}
 
 	/**
