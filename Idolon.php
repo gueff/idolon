@@ -82,6 +82,12 @@ class Idolon
     protected $_sImagePath = __DIR__;
 
     /**
+     * absolute path to cache folder
+     * @var string
+     */
+    protected $_sCachePath = __DIR__;
+
+    /**
      * image by name
      * @access protected 
      * @var string
@@ -157,6 +163,7 @@ class Idolon
         (isset($aConfig['sConvertExecutable'])) ? $this->_sConvertExecutable = (string) $aConfig['sConvertExecutable'] : false;
         (isset($aConfig['s404Base64Image'])) ? $this->_s404Base64Image = (string) $aConfig['s404Base64Image'] : false;
         (isset($aConfig['sImagePath'])) ? $this->_sImagePath = (string) $aConfig['sImagePath'] : false;
+        $this->_sCachePath = (string) (isset($aConfig['sCachePath'])) ? $aConfig['sCachePath'] : $this->_sImagePath;
         (isset($aConfig['bPreventOversizing'])) ? $this->_bPreventOversizing = (boolean) $aConfig['bPreventOversizing'] : true;
         
         if (isset($aConfig['sImage']))
@@ -229,6 +236,20 @@ class Idolon
         return $this;
     }
 
+    /**
+     * sets path to cache folder
+     * @param string $sCachePath
+     * @return $this
+     */
+    public function setCachepath(string $sCachePath = '')
+    {
+        if ('' !== $sCachePath)
+        {
+            $this->_sCachePath = $sCachePath;
+        }
+
+        return $this;
+    }
 
     /**
      * sets Sanitize Closure
@@ -481,11 +502,11 @@ class Idolon
 		$this->aspectSafe($fRatio);
 		$sFilenameDelivery = $this->buildFilename();
 
-		if (!file_exists(realpath($this->_sImagePath . '/' . $sFilenameDelivery)))
-		{
-			$this->create($this->_sImage, $sFilenameDelivery);
-		}
-        
+        if (!file_exists(realpath($this->_sCachePath . '/' . $sFilenameDelivery)))
+        {
+            $this->create($this->_sImage, $sFilenameDelivery);
+        }
+
 		return $this->deliver($sFilenameDelivery);
 	}
 
@@ -532,7 +553,7 @@ class Idolon
 	 */
 	protected function imageRenewed() : bool
 	{
-		$sDotfile = $this->_sImagePath . '/' . '.' . $this->_sImage . '.txt';
+		$sDotfile = $this->_sCachePath . '/' . '.' . $this->_sImage . '.txt';
 		
 		if (!file_exists (realpath($this->_sImagePath . '/' . $this->_sImage)))
 		{
@@ -566,8 +587,8 @@ class Idolon
      */
 	protected function clearCachedFiles ()
 	{
-		$aCached = glob(realpath($this->_sImagePath . '/' . $this->_sImage) . '_*');
-		$sDotfile = $this->_sImagePath . '/' . '.' . $this->_sImage . '.txt';
+		$aCached = glob(realpath($this->_sCachePath . '/' . $this->_sImage) . '_*');
+		$sDotfile = $this->_sCachePath . '/' . '.' . $this->_sImage . '.txt';
 		
 		foreach ($aCached as $sImage)
 		{
@@ -763,15 +784,14 @@ class Idolon
 	{
 		$sTmp = md5(uniqid() . microtime(true));
 
-		$sCmd = $this->_sConvertExecutable . ' ' . $this->_sImagePath . '/' . $sSource . ' -resize ' 
-            . $this->_iDimensionX . 'x' . $this->_iDimensionY . ((0 === $this->_iRedirect) ? '!' : false) . ' ' 
-            . $this->_sImagePath . '/' . $sTmp;
+        $sCmd = $this->_sConvertExecutable . ' ' . $this->_sImagePath . '/' . $sSource . ' -resize '
+            . $this->_iDimensionX . 'x' . $this->_iDimensionY . ((0 === $this->_iRedirect) ? '!' : false) . ' '
+            . $this->_sCachePath . '/' . $sTmp;
+
 		$this->log($sCmd);
 		shell_exec($sCmd);
 
-		$aDimension = getimagesize($this->_sImagePath . '/' . $sTmp);
-
-		rename($this->_sImagePath . '/' . $sTmp, $this->_sImagePath . '/' . $sTarget);
+		rename($this->_sCachePath . '/' . $sTmp, $this->_sCachePath . '/' . $sTarget);
 	}
 
     /**
@@ -790,12 +810,12 @@ class Idolon
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
 
-        if (true === file_exists(realpath($this->_sImagePath . '/' . $sFilename)) && is_file(realpath($this->_sImagePath . '/' . $sFilename)))
+        if (true === file_exists(realpath($this->_sCachePath . '/' . $sFilename)) && is_file(realpath($this->_sCachePath . '/' . $sFilename)))
         {
-            $this->log($this->_sImagePath . '/' . $sFilename);
-            header("Content-Length: " . filesize($this->_sImagePath . '/' . $sFilename) . " bytes");
+            $this->log($this->_sCachePath . '/' . $sFilename);
+            header("Content-Length: " . filesize($this->_sCachePath . '/' . $sFilename) . " bytes");
 
-    		$mReadfile = readfile($this->_sImagePath . '/' . $sFilename);
+    		$mReadfile = readfile($this->_sCachePath . '/' . $sFilename);
 
             if (false !== $mReadfile)
             {
