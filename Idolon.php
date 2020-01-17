@@ -488,7 +488,7 @@ class Idolon
         // delete all caches from original image which changed
 		if (true === $this->imageRenewed())
 		{
-			$this->clearCachedFiles();
+			$this->clearCachedFiles($this->_sImage);
 		}
 
 		$aDimension = $this->getDimensionArray();
@@ -539,7 +539,7 @@ class Idolon
             )
 		{
 			$this->deliver();
-			$this->clearCachedFiles();            
+			$this->clearCachedFiles($this->_sImage);
 			return false;
 		}
         
@@ -582,25 +582,29 @@ class Idolon
 
     /**
      * delete already recalced and so cached files
-     * @access protected 
-     * @return void
+     * @param string $sFile
      */
-	protected function clearCachedFiles ()
+	public function clearCachedFiles ($sFile = '')
 	{
-		$aCached = glob(realpath($this->_sCachePath . '/' . $this->_sImage) . '_*');
-		$sDotfile = $this->_sCachePath . '/' . '.' . $this->_sImage . '.txt';
-		
-		foreach ($aCached as $sImage)
-		{
-            if (file_exists($sDotfile))
+        $aCached = glob($this->_sCachePath . $sFile . '_*');
+        $sDotfile = $this->_sCachePath . '.' . $sFile . '.txt';
+        $sDotfile = (string) preg_replace('#(\.\.\/)+#', '', trim($sDotfile));
+        $sDotfile = (string) preg_replace('#/+#', '/', trim($sDotfile));
+
+        foreach ($aCached as $sImage)
+        {
+            $sImage = (string) preg_replace('#(\.\.\/)+#', '', trim($sImage));
+            $sImage = (string) preg_replace('#/+#', '/', trim($sImage));
+
+            if (file_exists($sImage))
             {
-    			unlink($sImage);
+                unlink($sImage);
             }
-		}
-		
+        }
+
         if (file_exists($sDotfile))
         {
-    		unlink($sDotfile);		
+            unlink($sDotfile);
         }
 	}
 
