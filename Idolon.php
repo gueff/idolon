@@ -823,7 +823,7 @@ class Idolon
 
             if (false !== $mReadfile)
             {
-                return true;
+                exit();
             }
         }
         else
@@ -833,7 +833,7 @@ class Idolon
 
             if (false !== $mDecode)
             {
-                return true;
+                exit();
             }
         }
 
