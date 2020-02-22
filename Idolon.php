@@ -553,8 +553,8 @@ class Idolon
 	 */
 	protected function imageRenewed() : bool
 	{
-		$sDotfile = $this->_sCachePath . '/' . '.' . $this->_sImage . '.txt';
-		
+		$sDotfile = $this->_sCachePath . '/' . '.' . self::seofy($this->_sImage) . '.' . md5($this->_sImagePath) . '.txt';
+
 		if (!file_exists (realpath($this->_sImagePath . '/' . $this->_sImage)))
 		{
 			return false;
@@ -581,30 +581,21 @@ class Idolon
 	}
 
     /**
-     * delete already recalced and so cached files
+     * delete all cache files of image
      * @param string $sFile
      */
 	public function clearCachedFiles ($sFile = '')
 	{
-        $aCached = glob($this->_sCachePath . $sFile . '_*');
-        $sDotfile = $this->_sCachePath . '.' . $sFile . '.txt';
-        $sDotfile = (string) preg_replace('#(\.\.\/)+#', '', trim($sDotfile));
-        $sDotfile = (string) preg_replace('#/+#', '/', trim($sDotfile));
+        ('' === $sFile) ? $sFile = $this->_sImage : false;
+        $sFile = self::seofy($sFile);
+        $aCached = glob($this->_sCachePath . '{,.}*' . $sFile . '*[!.,!..]' , GLOB_MARK | GLOB_BRACE);
 
-        foreach ($aCached as $sImage)
+        foreach ($aCached as $sFileAbs)
         {
-            $sImage = (string) preg_replace('#(\.\.\/)+#', '', trim($sImage));
-            $sImage = (string) preg_replace('#/+#', '/', trim($sImage));
-
-            if (file_exists($sImage))
+            if (file_exists($sFileAbs) && is_file($sFileAbs))
             {
-                unlink($sImage);
+                unlink($sFileAbs);
             }
-        }
-
-        if (file_exists($sDotfile))
-        {
-            unlink($sDotfile);
         }
 	}
 
@@ -696,10 +687,26 @@ class Idolon
      */
 	protected function buildFilename() : string
 	{
-		$sFilenameDelivery = $this->_sImage . '_' . $this->_iDimensionX . 'x' . $this->_iDimensionY . '.' . pathinfo($this->_sImage, PATHINFO_EXTENSION);
+        $sFilenameDelivery = self::seofy($this->_sImage) . '.'
+            . md5($this->_sImage . '_' . $this->_iDimensionX . 'x' . $this->_iDimensionY . '.' . pathinfo($this->_sImage, PATHINFO_EXTENSION));
 
 		return $sFilenameDelivery;
 	}
+
+    /**
+     * @param string $sString
+     * @return false|string|string[]|null
+     */
+	protected static function seofy($sString = '')
+    {
+        $sString = preg_replace ('/[^\pL\d_]+/u', '-', $sString);
+        $sString = trim ($sString, "-");
+        $sString = iconv ('utf-8', "us-ascii//TRANSLIT", $sString);
+        $sString = strtolower ($sString);
+        $sString = preg_replace ('/[^-a-z0-9_]+/', '', $sString);
+
+        return $sString;
+    }
 
     /**
      * sets y to proper ascpect ratio if necessary; redirect to url with proper values if wanted
